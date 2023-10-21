@@ -1,10 +1,13 @@
-from kivy.app import App
-from kivy.uix.widget import Widget
+from kivy.app import App #base class for creating and starting kivy applications
+from kivy.uix.widget import Widget #Widget class for all ui classes to inherit from
 from kivy.properties import (
     NumericProperty, ReferenceListProperty, ObjectProperty
-)
-from kivy.vector import Vector
-from kivy.clock import Clock
+) 
+#numberic property allows contraint to use only numeric values
+#referenceList property automatically changes values of parameters used to create the reference list property
+#objectProperty allows creating a reference to .kv file widgets withinthe python code
+from kivy.vector import Vector #vector of cartesian coordinates
+from kivy.clock import Clock #used to schedule events at specified intervals here
 
 
 class PongPaddle(Widget):
@@ -29,6 +32,9 @@ class PongBall(Widget):
 
 
 class PongGame(Widget):
+    #objects in .kv file 
+    #these are specified under ponggame widget 
+    # and mapped to the file's widgets in the .kv file as ball: pong_ball
     ball = ObjectProperty(None)
     player1 = ObjectProperty(None)
     player2 = ObjectProperty(None)
@@ -63,13 +69,13 @@ class PongGame(Widget):
             self.player2.center_y = touch.y
 
 
-class PongApp(App):
-    def build(self):
+class PongApp(App): #inheriting kivy's app class
+    def build(self):  #overloading build method that defines behaviour on calling run method
         game = PongGame()
         game.serve_ball()
-        Clock.schedule_interval(game.update, 1.0 / 60.0)
+        Clock.schedule_interval(game.update, 1.0 / 60.0)#scheduling method calls of game object
         return game
 
 
 if __name__ == '__main__':
-    PongApp().run()
+    PongApp().run() #construct the application object then run it
