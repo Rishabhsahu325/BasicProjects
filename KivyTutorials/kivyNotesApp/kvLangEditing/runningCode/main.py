@@ -189,15 +189,10 @@ class Catalog(BoxLayout):
         # Create a popup and pass the file chooser as the content
         filechooser = FileChooserListView()
         self.popup = Popup(title="Choose a file", content=filechooser, size_hint=(0.9, 0.9), auto_dismiss=False)
-        
+        filechooser.path="."
         selectFileButton = Button(text="Open", size_hint=(1, 0.1))
         selectFileButton.bind(on_release=self.load_file)
-        # Create a button to close the popup
-        # close_button = Button(text="Close", size_hint=(1, 0.1))
-        # close_button.bind(on_release=self.close_popup)
         
-        # Add the buttons to the file chooser
-        # filechooser.add_widget(close_button)
         filechooser.add_widget(selectFileButton)
         # Open the popup
         self.popup.open()
