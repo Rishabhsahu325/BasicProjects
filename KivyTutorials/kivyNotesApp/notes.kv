@@ -1,0 +1,64 @@
+<InsertNote>:
+    #Need to create a bounding rectangle here
+    orientation:"vertical"
+    padding: 10
+    #purple bounding box
+    canvas:
+        Color:
+            rgba: .1, .1, 1, .9 
+        Line:
+            width: 2.
+            rectangle: (self.x, self.y, self.width, self.height)
+        
+    TextInput:
+    #Enter Note here
+        id: enterNote
+        multiline: True
+        focus:True
+        hint_text: "Enter your note here.."
+        font_size: "28sp"
+    Button:
+    	id: insertNote
+    	on_press: self.parent.addNote()
+    	#on_release: self.parent.removeText()
+        text:"ADD"
+        padding: 10
+        background_color:"blue"
+        size_hint: 1, None
+        height: "40dp"
+        pos_hint: {'center_x': .5}
+<NoteManager>:
+    id:NM
+    labelNote: title
+    orientation: "vertical"
+    BoxLayout:
+        canvas.before:
+            Color:
+                rgba: 1,1,1,1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+
+        padding: 40
+        orientation: "vertical"
+        Label: 
+            id:title
+            text:"Notes App1"
+            text_size: self.size
+            font_size:40
+            halign:'left'
+            valign:'middle'
+            size_hint_y: None
+            height: "50dp"
+            color: "black"
+        
+        #save Notes to file and refresh list
+
+
+        InsertNote:    
+        #need to add a scrollable interface #to view the individual notess
+        #display list of inserted notes here
+            id: viewNotes
+        
+        #fetch todos from file
+        
