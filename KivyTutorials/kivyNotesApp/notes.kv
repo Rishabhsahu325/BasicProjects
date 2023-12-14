@@ -1,8 +1,31 @@
+
+
+<DisplayList>:
+	# greenish bounding box
+    canvas.before:
+		Color:
+            rgba: .1, 1,.1, .9
+        Line:
+            width: 2.
+            rectangle: (self.x, self.y, self.width, self.height)
+	ScrollView:
+		id:scroll
+		
+		do_scroll_x: False
+		do_scroll_y: True
+		BoxLayout:
+			
+			orientation:"vertical"
+		    padding: 10,10
+		    size_hint_y:None
+			id: noteList
+			
+		
+		
+			
 <InsertNote>:
-    #Need to create a bounding rectangle here
     orientation:"vertical"
     padding: 10
-    #purple bounding box
     canvas:
         Color:
             rgba: .1, .1, 1, .9 
@@ -20,13 +43,14 @@
     Button:
     	id: insertNote
     	on_press: self.parent.addNote()
-    	#on_release: self.parent.removeText()
+    	on_release: self.parent.removeText()
         text:"ADD"
         padding: 10
         background_color:"blue"
         size_hint: 1, None
         height: "40dp"
         pos_hint: {'center_x': .5}
+        
 <NoteManager>:
     id:NM
     labelNote: title
@@ -53,12 +77,8 @@
             color: "black"
         
         #save Notes to file and refresh list
-
-
-        InsertNote:    
-        #need to add a scrollable interface #to view the individual notess
-        #display list of inserted notes here
+        InsertNote:
             id: viewNotes
-        
-        #fetch todos from file
-        
+        DisplayList:
+        	id: noteListParent
+
