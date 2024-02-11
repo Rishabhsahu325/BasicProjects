@@ -1,4 +1,22 @@
-
+<ListItem>:
+	
+	#BoxLayout:
+	#boundary box
+	canvas.before:
+		Color:
+            rgba: 0, 0, 0, .9
+        Line:
+            width: 1.
+            rectangle: (self.x, self.y, self.width, self.height)
+	orientation:"vertical"
+	#Title
+	Label:
+		text:self.parent.title
+		color:"black"
+	#Need to create a TextInput field that allows editing after clicking
+	TextInput:
+		text:self.parent.content
+		color:"black"
 
 <DisplayList>:
 	# greenish bounding box

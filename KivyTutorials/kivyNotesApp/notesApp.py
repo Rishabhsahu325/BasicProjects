@@ -37,43 +37,42 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
         textfield=self.ids.enterNote
         textfield.select_all()
         textfield.delete_selection()
-class listItem(Widget):#items)
+class ListItem(BoxLayout):# Note items
+    def __init__(self,noteTitle,noteContent,noteHash,**kwargs):
+        self.title=noteTitle
+        self.content=noteContent
+        self.identifier=noteHash
+        
+        super().__init__(**kwargs)
+        
+        
     def addNoteItem(self,content):
         this.ids.noteContent.text=content
     
 class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.fileObj="./notes.fnote"
+        #notes dictionary by serial number
+        self.notesDict={}
+        
+        
     def updateNotes():
-        pass
-    #SHOULD i KEEP THE Notes FILE OPEN?
-        #Probably store in some temporary variable
+        with open(self.fileObj, "w") as noteFile:
+            #maybe store existing notes content in file for backup
+
+            # after storing ,remove existing notes content
+            noteFile.seek(0,0)# place pointer at starting
+            noteFile.write("")
+            #if writing all notes from single object
+            noteFile.write(updatedNotes)#assuming updatedNotes contains updated version of notes
+            #additional optimization , may only modify the individual edited notes ,instead 
+            #of modifying all the notes
             
-        #try :
-        #    with open("./notes.fnote","a") as noteFile:
-                #Break and format above content into format of note to be inserted in the notes file
-                #write above content to that file
-               
-                #noteFile.read("||||\n")
-                #read until encountering end of the note list time
-                #noteFile.read(noteContent)
-                #noteFile.write("\n$$$$\n")
-        #try to open notes file
-
-        #if it exists then collect todos from that file and display
-
-            # Decode each note as a separate listItem
-
-        #otherwise return None ,indicating no notes exist yet 
-        #dynamically add a new widget for each note text
-        #for noteObj in whatever:
-        #    this.add_widget(listItem(noteObj))
+   
     def display(self):
         notesList=self.ids.noteList #box layout section
-        for i in range(20):
-            try:
-                notesList.add_widget(Label(text="Demo"+str(i),color="black"))
-                notesList.height=len(notesList.children)*40
-            except Exception as e:
-                print("Some error in adding widget")
+        
 #handle root widget
 class NoteManager(BoxLayout):
     pass
