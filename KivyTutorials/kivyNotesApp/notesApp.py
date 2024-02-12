@@ -9,6 +9,10 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label # for testing adding of widget at the start
 #probable libraries for packaging application
 
+#For notes data management
+import sqlite3
+import os
+
 
 #classes to manage ui components
 
@@ -16,23 +20,38 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
 
     def addNote(self):
         #collect content from Text input and store in variable
-        noteContent= self.ids.enterNote.text #Indexing starts from bottom
-        #open notes file .fnote if exists ,otherwise create a new file
-        try :
-            with open("./notes.fnote","a") as noteFile:
-                #Break and format above content into format of note to be inserted in the notes file
-                #write above content to that file
-               
-                noteFile.write("||||\n")
-                #Need to add a unique note identifier  
-                noteFile.write(noteContent)
-                noteFile.write("\n$$$$\n")
-        except FileExistsError:
-            print("Notes storage file doesn't exist yet. Creating new file")
-            with open("./notes.fnote","w") as noteFile:
-                noteFile.write("||||\n")
-                noteFile.write(noteContent)
-                noteFile.write("\n$$$$\n")
+        noteObj= self.ids.enterNote #Indexing starts from bottom
+        
+        #create a connection object
+        
+        script_dir = os.path.abspath( os.path.dirname( __file__ ) )
+        #conn =sqlite3.connect(script_dir+"/notes.fnote")
+        conn =sqlite3.connect("./notes.fnote")
+        #use cursor for data manipulation
+        cursor= conn.cursor()
+        
+        #uSING tags as text for now ,maybe will convert to indexed field that will act like a key to find same hash value notes
+        #create table query string        
+        createQry= "CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT, content TEXT,tags TEXT)"
+        cursor.execute(createQry)
+        
+        #note insert query string
+        query="INSERT INTO notes(title,content,tags) VALUES (?,?,?)"
+        parameters=(noteObj.title,noteObj.text,noteObj.tag)
+        #execute the query
+        cursor.execute(query,parameters)
+        print(cursor)
+        for row in cursor:
+            print(row)
+        #commit changes
+        conn.commit()
+        #depending on the requirement you might use a single connection object for all data manipulation operations 
+        #after all notes have been edited display status of operation
+
+        #close the connection 
+        cursor.close()
+        conn.close()
+        
     def removeText(self):
         textfield=self.ids.enterNote
         textfield.select_all()
@@ -52,23 +71,23 @@ class ListItem(BoxLayout):# Note items
 class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.fileObj="./notes.fnote"
-        #notes dictionary by serial number
-        self.notesDict={}
-        
-        
-    def updateNotes():
-        with open(self.fileObj, "w") as noteFile:
-            #maybe store existing notes content in file for backup
 
-            # after storing ,remove existing notes content
-            noteFile.seek(0,0)# place pointer at starting
-            noteFile.write("")
-            #if writing all notes from single object
-            noteFile.write(updatedNotes)#assuming updatedNotes contains updated version of notes
-            #additional optimization , may only modify the individual edited notes ,instead 
-            #of modifying all the notes
-            
+    # def updateNotes():
+        # #create a connection object
+        # conn =sqlite3.connect("notes.fnote")
+        # #use cursor for data manipulation
+        # cursor= conn.cursor()
+        # #note update query string
+        # 
+        # #iterate and edit the modified notes through the use of the connection object
+    # 
+        # #commit changes
+# 
+        # #depending on the requirement you might use a single connection object for all data manipulation operations
+        # #after all notes have been edited display status of operation
+# 
+        # #close the connection
+            # 
    
     def display(self):
         notesList=self.ids.noteList #box layout section
