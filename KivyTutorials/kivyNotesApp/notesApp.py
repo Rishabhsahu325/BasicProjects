@@ -40,17 +40,28 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
         parameters=(noteObj.title,noteObj.text,noteObj.tag)
         #execute the query
         cursor.execute(query,parameters)
-        print(cursor)
-        for row in cursor:
-            print(row)
+       
         #commit changes
         conn.commit()
         #depending on the requirement you might use a single connection object for all data manipulation operations 
         #after all notes have been edited display status of operation
-
+        gp=this.parent.parent
+        nlp=gp.ids.noteListParent
+        notesList=nlp.ids.noteList
+        #notesList=((self.parent.ids).noteListParent.ids).noteList
+        
+        for row in cursor:
+            try:
+                notesList.add_widget(Label(text=row[2],color="black"))
+                notesList.height=len(notesList.children)*40
+            except Exception as e:
+                print("Error in adding widget")
+                print(e)
+                            
         #close the connection 
         cursor.close()
         conn.close()
+        
         
     def removeText(self):
         textfield=self.ids.enterNote
@@ -60,7 +71,7 @@ class ListItem(BoxLayout):# Note items
     def __init__(self,noteTitle,noteContent,noteHash,**kwargs):
         self.title=noteTitle
         self.content=noteContent
-        self.identifier=noteHash
+        
         
         super().__init__(**kwargs)
         
@@ -72,25 +83,58 @@ class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
-    # def updateNotes():
-        # #create a connection object
-        # conn =sqlite3.connect("notes.fnote")
-        # #use cursor for data manipulation
-        # cursor= conn.cursor()
-        # #note update query string
-        # 
-        # #iterate and edit the modified notes through the use of the connection object
-    # 
-        # #commit changes
-# 
-        # #depending on the requirement you might use a single connection object for all data manipulation operations
-        # #after all notes have been edited display status of operation
-# 
-        # #close the connection
-            # 
+    def updateNotes():
+        #create a connection object
+        conn =sqlite3.connect("notes.fnote")
+        #use cursor for data manipulation
+        cursor= conn.cursor()
+        #note update query string
+        
+        #iterate and edit the modified notes through the use of the connection object
+    
+        #commit changes
+
+        #depending on the requirement you might use a single connection object for all data manipulation operations
+        #after all notes have been edited display status of operation
+
+        #close the connection
+            
    
     def display(self):
         notesList=self.ids.noteList #box layout section
+                
+        #create a connection object
+        
+        script_dir = os.path.abspath( os.path.dirname( __file__ ) )
+        #conn =sqlite3.connect(script_dir+"/notes.fnote")
+        conn =sqlite3.connect("./notes.fnote")
+        #use cursor for data manipulation
+        cursor= conn.cursor()
+        
+        #uSING tags as text for now ,maybe will convert to indexed field that will act like a key to find same hash value notes
+        
+        #note insert query string
+        query="SELECT * FROM  notes"
+        
+        #execute the query
+        cursor.execute(query)
+
+        for row in cursor:
+            try:
+                notesList.add_widget(Label(text=row[2],color="black"))
+                notesList.height=len(notesList.children)*40
+            except Exception as e:
+                print("Error in adding widget")
+                print(e)
+                
+        #commit changes
+        conn.commit()
+        #depending on the requirement you might use a single connection object for all data manipulation operations 
+        #after all notes have been edited display status of operation
+
+        #close the connection 
+        cursor.close()
+        conn.close()
         
 #handle root widget
 class NoteManager(BoxLayout):
