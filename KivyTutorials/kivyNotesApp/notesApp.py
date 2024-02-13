@@ -21,7 +21,8 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
     def addNote(self):
         try:
             #collect content from Text input and store in variable
-            noteObj= self.ids.enterNote #Indexing starts from bottom
+            noteTitle=self.ids.enterTitle
+            noteCont= self.ids.enterNote #Indexing starts from bottom
             
             #create a connection object
             
@@ -34,11 +35,12 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
             #uSING tags as text for now ,maybe will convert to indexed field that will act like a key to find same hash value notes
             #create table query string        
             createQry= "CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT, content TEXT,tags TEXT)"
+            
             cursor.execute(createQry)
             
             #note insert query string
             query="INSERT INTO notes(title,content,tags) VALUES (?,?,?)"
-            parameters=(noteObj.title,noteObj.text,noteObj.tag)
+            parameters=(noteTitle.text,noteCont.text,noteCont.tag)
             #execute the query
             cursor.execute(query,parameters)
            
@@ -52,7 +54,7 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
             #close the connection 
             cursor.close()
             conn.close()
-            noteListBox.addListItem(title="DefaultTitle",content=noteObj.text)
+            noteListBox.addListItem(title=noteTitle.text,content=noteCont.text)
             
         except Exception as e:
             print("Error in inserting data and creating new noteList Item widget")
@@ -62,9 +64,12 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
         textfield=self.ids.enterNote
         textfield.select_all()
         textfield.delete_selection()
+        titlefield=self.ids.enterTitle
+        titlefield.select_all()
+        titlefield.delete_selection()
         
 class ListItem(BoxLayout):# Note items
-    def __init__(self,noteTitle,noteContent,noteHash,**kwargs):
+    def __init__(self,noteTitle,noteContent,*tags,**kwargs):
         self.title=noteTitle
         self.content=noteContent        
         super().__init__(**kwargs)
@@ -75,9 +80,9 @@ class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
 
 
     def addListItem(self,title,content,*tags):   
-        print(content)
-        self.ids['noteList'].add_widget(Label(text=content,color="black")) #row[2]
-        self.ids['noteList'].height=len(self.ids['noteList'].children)*40
+        # self.ids['noteList'].add_widget(Label(text=content,color="black")) #row[2]
+        self.ids['noteList'].add_widget(ListItem(noteTitle=title,noteContent=content))
+        self.ids['noteList'].height=len(self.ids['noteList'].children)*100
            
     # def updateNotes(self):
         # #create a connection object
@@ -116,8 +121,8 @@ class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
         cursor.execute(query)
         for row in cursor:
             try:
-                self.addListItem(title="defTitle",content=row[2])
-                print("Display of this note successful")
+                self.addListItem(title=row[1],content=row[2])
+                #print("Display of this note successful")
             except Exception as e:
                 print("Error in adding widget")
                 print(e)

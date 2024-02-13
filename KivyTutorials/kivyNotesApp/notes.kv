@@ -13,8 +13,9 @@
 	Label:
 		text:self.parent.title
 		color:"black"
-	#Need to create a TextInput field that allows editing after clicking
-	TextInput:
+	#In future Need to create a TextInput field that allows editing after clicking
+	#TextInput:
+	Label:
 		text:self.parent.content
 		color:"black"
 
@@ -46,16 +47,23 @@
         Line:
             width: 2.
             rectangle: (self.x, self.y, self.width, self.height)
-        
+    TextInput:
+    	id: enterTitle
+    	multiline: False
+    	focus:True
+    	hint_text: "Enter note Title"
+    	font_size: "40sp"
     TextInput:
     #Enter Note here
         id: enterNote
         tag:"default"
-        title:"DefTitle"
+#       title:"DefTitle"
         multiline: True
         focus:True
         hint_text: "Enter your note here.."
         font_size: "28sp"
+    #space for widget to add tags
+    
     Button:
     	id: insertNote
     	on_press: self.parent.addNote()
