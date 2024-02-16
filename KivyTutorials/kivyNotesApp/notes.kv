@@ -13,7 +13,7 @@
 	Label:
 		text:self.parent.title
 		color:"black"
-	#In future Need to create a TextInput field that allows editing after clicking
+	#In future may have to create a TextInput field that allows editing after clicking
 	#TextInput:
 	Label:
 		text:self.parent.content
@@ -62,12 +62,14 @@
         focus:True
         hint_text: "Enter your note here.."
         font_size: "28sp"
+        
+   
     #space for widget to add tags
     
     Button:
     	id: insertNote
     	on_press: self.parent.addNote()
-    	on_release: self.parent.removeText()
+    	on_release: self.parent.removeText(self.parent.ids['enterTitle'],self.parent.ids['enterNote'])
         text:"ADD"
         padding: 10
         background_color:"blue"
@@ -89,17 +91,36 @@
 
         padding: 40
         orientation: "vertical"
-        Label: 
-            id:title
-            text:"Notes App1"
-            text_size: self.size
-            font_size:40
-            halign:'left'
-            valign:'middle'
-            size_hint_y: None
-            height: "50dp"
-            color: "black"
-        
+        height: "50dp"
+        BoxLayout:
+        	orientation: "horizontal"
+	        Label: 
+	            id:title
+	            text:"Notes App1"
+	            text_size: self.size
+	            font_size:40
+	            halign:'left'
+	            valign:'middle'
+	            color: "black"
+	        TextInput:
+	        	id:notesSearch
+				multiline: False
+				hint_text: "Search term"
+				size_hint_y: 0.25
+	        Button:
+	        	id:searchNow
+        		text: "Search"
+        		size_hint_x:0.2
+        		size_hint_y: 0.25
+        		on_press:self.parent.parent.parent.ids['noteListParent'].searchCall(criteria=0,title=self.parent.parent.parent.ids['notesSearch'].text)
+        		on_release:self.parent.parent.parent.removeText(self.parent.parent.parent.ids['notesSearch'])
+        	Button:
+        		id:clearSearch
+        		text:"Clear Search"
+        		size_hint_x:0.2
+        		size_hint_y: 0.25
+        		on_press:self.parent.parent.parent.ids['noteListParent'].searchCall(criteria=2,title=None)
+        		on_release:self.parent.parent.parent.removeText(self.parent.parent.parent.ids['notesSearch'])	
         #save Notes to file and refresh list
         InsertNote:
             id: viewNotes

@@ -13,30 +13,31 @@ from kivy.uix.label import Label # for testing adding of widget at the start
 import sqlite3
 import os
 #depending on the requirement you might use a single connection object for all data manipulation operations
+script_dir = os.path.abspath( os.path.dirname( __file__ ) )
 
+
+
+
+def removeText(*tfs):
+    for textfield in tfs:
+        textfield.select_all()
+        textfield.delete_selection()
+        
 #classes to manage ui components
 
+            
 class InsertNote(BoxLayout): #text field for creating object in todo list
 
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.removeText=removeText
     def addNote(self):
         try:
             #collect content from Text input and store in variable
             noteTitle=self.ids.enterTitle
             noteCont= self.ids.enterNote #Indexing starts from bottom
             
-            #create a connection object
-            
-            script_dir = os.path.abspath( os.path.dirname( __file__ ) )
-            #conn =sqlite3.connect(script_dir+"/notes.fnote")
-            conn =sqlite3.connect("./notes.fnote")
-            #use cursor for data manipulation
-            cursor= conn.cursor()
-            
             #uSING tags as text for now ,maybe will convert to indexed field that will act like a key to find same hash value notes
-            #create table query string        
-            createQry= "CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT, content TEXT,tags TEXT)"
-            
-            cursor.execute(createQry)
             
             #note insert query string
             query="INSERT INTO notes(title,content,tags) VALUES (?,?,?)"
@@ -49,24 +50,14 @@ class InsertNote(BoxLayout): #text field for creating object in todo list
             
             noteListBox=self.parent.parent.ids["noteListParent"]
             #In sqlite insertion query does not return inserted rows and result is typically emtpy
-            #commit changes 
             conn.commit()                    
-            #close the connection 
-            cursor.close()
-            conn.close()
             noteListBox.addListItem(title=noteTitle.text,content=noteCont.text)
             
         except Exception as e:
             print("Error in inserting data and creating new noteList Item widget")
             print(e)
             
-    def removeText(self):
-        textfield=self.ids.enterNote
-        textfield.select_all()
-        textfield.delete_selection()
-        titlefield=self.ids.enterTitle
-        titlefield.select_all()
-        titlefield.delete_selection()
+    
         
 class ListItem(BoxLayout):# Note items
     def __init__(self,noteTitle,noteContent,*tags,**kwargs):
@@ -77,75 +68,75 @@ class ListItem(BoxLayout):# Note items
 class DisplayList(BoxLayout): #for displaying list of Notes that are inserted
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-
+        self.removeText=removeText
 
     def addListItem(self,title,content,*tags):   
         # self.ids['noteList'].add_widget(Label(text=content,color="black")) #row[2]
         self.ids['noteList'].add_widget(ListItem(noteTitle=title,noteContent=content))
         self.ids['noteList'].height=len(self.ids['noteList'].children)*100
            
-    # def updateNotes(self):
-        # #create a connection object
-        # conn =sqlite3.connect("notes.fnote")
-        # #use cursor for data manipulation
-        # cursor= conn.cursor()
-        # #note update query string
-        # 
-        # #iterate and edit the modified notes through the use of the connection object
-# 
-        # #commit changes
-# 
-        # #depending on the requirement you might use a single connection object for all data manipulation operations
-        # #after all notes have been edited display status of operation
-# 
-        # #close the connection
-            # 
-   
-    def display(self):
-        notesList=self.ids.noteList #box layout section
-                
-        #create a connection object
+    
+    def cleanNotesList(self):
+        #First remove any previously existing note List Items
+        self.ids['noteList'].clear_widgets()
+    def executeQuery(self,command,title,*tags):
         
-        script_dir = os.path.abspath( os.path.dirname( __file__ ) )
-        #conn =sqlite3.connect(script_dir+"/notes.fnote")
-        conn =sqlite3.connect("./notes.fnote")
-        #use cursor for data manipulation
-        cursor= conn.cursor()
+        if command ==0:#display notes filtered by search title
+            query="SELECT * FROM notes WHERE title=(?)"
+            parameters=(title,)
+        #elif command==1 :#display notes filtered by search tags
         
-        #uSING tags as text for now ,maybe will convert to indexed field that will act like a key to find same hash value notes
-        
-        #note insert query string
-        query="SELECT * FROM  notes"
-        
-        #execute the query
-        cursor.execute(query)
-        for row in cursor:
+        else: # display all notes
+            query="SELECT * FROM  notes"
+            parameters=()
+        queryResult=cursor.execute(query,parameters)
+        return queryResult
+
+#uSING tags as text for now ,maybe will convert to indexed field that will act like a key to find same hash value notes
+    def display(self,queryResult):
+        notesList=self.ids.noteList #box layout section        
+        for row in queryResult:
             try:
                 self.addListItem(title=row[1],content=row[2])
                 #print("Display of this note successful")
             except Exception as e:
                 print("Error in adding widget")
                 print(e)
-                
-        #commit changes
-        conn.commit()
-
-        #close the connection 
-        cursor.close()
-        conn.close()
+    def searchCall(self,criteria,title,*tags):
+        result=self.executeQuery(criteria,title,*tags)
+        self.cleanNotesList()
+        self.display(result)
         
 #handle root widget
 class NoteManager(BoxLayout):
-    pass
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.removeText=removeText
     #after InsertNote portion loads, load the display List portion
     
     
 class NotesApp(App):
+    def __init__(self):
+        super().__init__()
+        self.manager=None
     def build(self):
-        manager= NoteManager()
-        manager.ids.noteListParent.display()
-        return manager
+        
+        self.manager= NoteManager()
+        return self.manager
 
+    def on_start(self):
+        global conn
+        global cursor
+        conn = sqlite3.connect("./notes.fnote")
+        cursor= conn.cursor()
+        createQry= "CREATE TABLE IF NOT EXISTS notes(id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT, content TEXT,tags TEXT)"
+        cursor.execute(createQry)
+        qr=self.manager.ids['noteListParent'].executeQuery(command=2,title=None)
+        self.manager.ids['noteListParent'].display(qr)
+        
+    def on_stop(self):
+        cursor.close()
+        conn.close()
 if __name__ == '__main__':
     NotesApp().run()
 
