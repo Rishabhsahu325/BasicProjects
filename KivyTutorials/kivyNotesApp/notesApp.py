@@ -189,9 +189,8 @@ class TagsDropDown(BoxLayout):
         except exception as e:
             print(e)
 
-class AssociatedTags(BoxLayout):
+class AssociatedTags(ScrollView):
     def __init__(self,*args,**kwargs):
-        
         super(AssociatedTags,self).__init__(*args,**kwargs)
     def addTagItem(self,tagItem):   
         self.ids['tagList'].add_widget(tagItem)

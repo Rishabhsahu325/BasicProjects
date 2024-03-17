@@ -30,8 +30,9 @@
 	    	
 	    	size:self.width,self.height
 	    	pos:self.x,self.y
-	#width:self.
+	
 	size_hint_y:None
+	size_hint_x:None
 	orientation:"horizontal"
 	Label:
 		id: tagText
@@ -46,11 +47,13 @@
 		active: self.parent.activate
 
 <AssociatedTags>:
-	ScrollView:	
-		do_scroll_x:True
-		BoxLayout:
-			id: tagList
-			orientation: "horizontal"
+	do_scroll_x:True
+	BoxLayout:
+		id: tagList
+		orientation: "horizontal"
+		# Fixes for horizontal scroll to work properly
+		width: self.minimum_width
+		size_hint_x:None
 			
 <DisplayList>:
 	size_hint_y: 0.6
